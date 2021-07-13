@@ -785,7 +785,7 @@ int main(int argc, char *argv[])
                     if (lock_enabled)
                         send_unlock(CAN_DOOR1_LOCK | CAN_DOOR2_LOCK | CAN_DOOR3_LOCK | CAN_DOOR4_LOCK);
                     break;
-                case SDLK_a:
+                case SDLK_q:
                     if (lock_enabled)
                     {
                         send_lock(CAN_DOOR1_LOCK);
@@ -795,7 +795,7 @@ int main(int argc, char *argv[])
                         send_unlock(CAN_DOOR1_LOCK);
                     }
                     break;
-                case SDLK_b:
+                case SDLK_w:
                     if (lock_enabled)
                     {
                         send_lock(CAN_DOOR2_LOCK);
@@ -805,7 +805,7 @@ int main(int argc, char *argv[])
                         send_unlock(CAN_DOOR2_LOCK);
                     }
                     break;
-                case SDLK_x:
+                case SDLK_a:
                     if (lock_enabled)
                     {
                         send_lock(CAN_DOOR3_LOCK);
@@ -815,7 +815,7 @@ int main(int argc, char *argv[])
                         send_unlock(CAN_DOOR3_LOCK);
                     }
                     break;
-                case SDLK_y:
+                case SDLK_s:
                     if (lock_enabled)
                     {
                         send_lock(CAN_DOOR4_LOCK);
