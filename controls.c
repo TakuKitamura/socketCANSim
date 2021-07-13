@@ -227,11 +227,13 @@ void send_speed()
             cf.len = speed_len;
             cf.data[speed_pos + 1] = (char)b & 0xff;
             cf.data[speed_pos] = (char)a & 0xff;
+            /*
             if (current_speed == 0)
             { // IDLE
                 cf.data[speed_pos] = rand() % 80;
                 cf.data[speed_pos + 1] = 208;
             }
+            */
             if (speed_pos)
                 randomize_pkt(0, speed_pos);
             if (speed_len != speed_pos + 2)
@@ -247,11 +249,13 @@ void send_speed()
         cf.len = speed_len;
         cf.data[speed_pos + 1] = (char)kph & 0xff;
         cf.data[speed_pos] = (char)(kph >> 8) & 0xff;
+        /*
         if (kph == 0)
         { // IDLE
             cf.data[speed_pos] = 1;
             cf.data[speed_pos + 1] = rand() % 255 + 100;
         }
+        */
         if (speed_pos)
             randomize_pkt(0, speed_pos);
         if (speed_len != speed_pos + 2)
