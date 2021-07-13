@@ -19,6 +19,7 @@
 #include <linux/can/raw.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <stdbool.h>
 
 #ifndef DATA_DIR
 #define DATA_DIR "./data/"
@@ -746,6 +747,11 @@ int main(int argc, char *argv[])
     SDL_RenderPresent(renderer);
     int button, axis; // Used for checking dynamic joystick mappings
 
+    bool q_is_locked = false;
+    bool a_is_locked = false;
+    bool w_is_locked = false;
+    bool s_is_locked = false;
+
     while (running)
     {
         while (SDL_PollEvent(&event) != 0)
@@ -775,55 +781,49 @@ int main(int argc, char *argv[])
                 case SDLK_RIGHT:
                     turning = 1;
                     break;
-                case SDLK_LSHIFT:
-                    lock_enabled = 1;
-                    if (unlock_enabled)
-                        send_lock(CAN_DOOR1_LOCK | CAN_DOOR2_LOCK | CAN_DOOR3_LOCK | CAN_DOOR4_LOCK);
-                    break;
-                case SDLK_RSHIFT:
-                    unlock_enabled = 1;
-                    if (lock_enabled)
-                        send_unlock(CAN_DOOR1_LOCK | CAN_DOOR2_LOCK | CAN_DOOR3_LOCK | CAN_DOOR4_LOCK);
-                    break;
                 case SDLK_q:
-                    if (lock_enabled)
+                    if (!q_is_locked)
                     {
                         send_lock(CAN_DOOR1_LOCK);
                     }
-                    else if (unlock_enabled)
+                    else
                     {
                         send_unlock(CAN_DOOR1_LOCK);
                     }
+                    q_is_locked = !q_is_locked;
                     break;
                 case SDLK_w:
-                    if (lock_enabled)
+                    if (!w_is_locked)
                     {
                         send_lock(CAN_DOOR2_LOCK);
                     }
-                    else if (unlock_enabled)
+                    else
                     {
                         send_unlock(CAN_DOOR2_LOCK);
                     }
+                    w_is_locked = !w_is_locked;
                     break;
                 case SDLK_a:
-                    if (lock_enabled)
+                    if (!a_is_locked)
                     {
                         send_lock(CAN_DOOR3_LOCK);
                     }
-                    else if (unlock_enabled)
+                    else
                     {
                         send_unlock(CAN_DOOR3_LOCK);
                     }
+                    a_is_locked = !a_is_locked;
                     break;
                 case SDLK_s:
-                    if (lock_enabled)
+                    if (!s_is_locked)
                     {
                         send_lock(CAN_DOOR4_LOCK);
                     }
-                    else if (unlock_enabled)
+                    else
                     {
                         send_unlock(CAN_DOOR4_LOCK);
                     }
+                    s_is_locked = !s_is_locked;
                     break;
                 }
                 kk_check(event.key.keysym.sym);
@@ -837,12 +837,6 @@ int main(int argc, char *argv[])
                 case SDLK_LEFT:
                 case SDLK_RIGHT:
                     turning = 0;
-                    break;
-                case SDLK_LSHIFT:
-                    lock_enabled = 0;
-                    break;
-                case SDLK_RSHIFT:
-                    unlock_enabled = 0;
                     break;
                 }
                 break;
