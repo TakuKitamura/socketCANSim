@@ -20,6 +20,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <stdbool.h>
+#include <time.h>
 
 #ifndef DATA_DIR
 #define DATA_DIR "./data/"
@@ -77,11 +78,14 @@
 #define PS3_AXIS_R2 13
 #define PS3_X_ROT 4
 #define PS3_Y_ROT 5
-#define PS3_Z_ROT 6    // The rotations are just guessed
+#define PS3_Z_ROT 6     // The rotations are just guessed
 #define MAX_SPEED 260.0 // Limiter 260.0 is full guage speed
-#define ACCEL_RATE 8.0 // 0-MAX_SPEED in seconds
+#define ACCEL_RATE 8.0  // 0-MAX_SPEED in seconds
 #define USB_CONTROLLER 0
 #define PS3_CONTROLLER 1
+
+#define INTERVAL_MIN 100
+#define INTERVAL_MAX 500
 
 // For now, specific models will be done as constants.  Later
 // We should use a config file
@@ -151,6 +155,8 @@ SDL_Haptic *gHaptic = NULL;
 SDL_Renderer *renderer = NULL;
 SDL_Texture *base_texture = NULL;
 int gControllerType = USB_CONTROLLER;
+
+int crash_time_count = -1;
 
 void kk_check(int);
 
@@ -314,11 +320,11 @@ void checkTurn()
 {
     if (currentTime > lastTurnSignal + 500)
     {
-        if (turning < 0)
+        if (turning < 0 || crash_time_count >= 0)
         {
             signal_state ^= CAN_LEFT_SIGNAL;
         }
-        else if (turning > 0)
+        else if (turning > 0 || crash_time_count >= 0)
         {
             signal_state ^= CAN_RIGHT_SIGNAL;
         }
@@ -752,9 +758,68 @@ int main(int argc, char *argv[])
     bool w_is_locked = false;
     bool s_is_locked = false;
 
+    int time_counter = 0;
+
+    srand((unsigned)time(NULL));
+
+    int unlock_door1_interval = rand() % INTERVAL_MAX + INTERVAL_MIN;
+    int unlock_door2_interval = rand() % INTERVAL_MAX + INTERVAL_MIN;
+    int unlock_door3_interval = rand() % INTERVAL_MAX + INTERVAL_MIN;
+    int unlock_door4_interval = rand() % INTERVAL_MAX + INTERVAL_MIN;
+    int turning_interval = rand() % INTERVAL_MAX + INTERVAL_MIN;
+
     while (running)
     {
-        while (SDL_PollEvent(&event) != 0)
+        if (crash_time_count >= 0 && time_counter - crash_time_count <= INTERVAL_MAX)
+        {
+            srand(time(NULL));
+
+            if (time_counter - crash_time_count == unlock_door1_interval)
+            {
+                if (rand() % 2 == 0)
+                {
+                    send_unlock(CAN_DOOR1_LOCK);
+                }
+            }
+
+            if (time_counter - crash_time_count == unlock_door2_interval)
+            {
+                if (rand() % 2 == 0)
+                {
+                    send_unlock(CAN_DOOR2_LOCK);
+                }
+            }
+
+            if (time_counter - crash_time_count == unlock_door3_interval)
+            {
+                if (rand() % 2 == 0)
+                {
+                    send_unlock(CAN_DOOR3_LOCK);
+                }
+            }
+
+            if (time_counter - crash_time_count == unlock_door4_interval)
+            {
+                if (rand() % 2 == 0)
+                {
+                    send_unlock(CAN_DOOR4_LOCK);
+                }
+            }
+
+            if (time_counter - crash_time_count == turning_interval)
+            {
+                if (rand() % 2 == 0)
+                {
+                    turning = -1;
+                }
+                else
+                {
+                    turning = 1;
+                }
+            }
+        }
+
+        while (SDL_PollEvent(&event) != 0 && crash_time_count == -1)
         {
             switch (event.type)
             {
@@ -838,8 +903,13 @@ int main(int argc, char *argv[])
                 case SDLK_RIGHT:
                     turning = 0;
                     break;
+                case SDLK_c:
+                    current_speed *= 0.1;
+                    crash_time_count = time_counter;
+                    throttle = 0;
+                    break;
                 }
-                break;
+
             case SDL_JOYAXISMOTION:
                 axis = event.jaxis.axis;
                 if (axis == gAxisLeftH)
@@ -998,6 +1068,7 @@ int main(int argc, char *argv[])
         checkAccel();
         checkTurn();
         SDL_Delay(5);
+        time_counter++;
     }
 
     close(s);
