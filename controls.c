@@ -154,6 +154,7 @@ SDL_Joystick *gJoystick = NULL;
 SDL_Haptic *gHaptic = NULL;
 SDL_Renderer *renderer = NULL;
 SDL_Texture *base_texture = NULL;
+SDL_Texture *crash_texture = NULL;
 int gControllerType = USB_CONTROLLER;
 
 int crash_time_count = -1;
@@ -819,7 +820,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        while (SDL_PollEvent(&event) != 0 && crash_time_count == -1)
+        while (SDL_PollEvent(&event) != 0)
         {
             switch (event.type)
             {
@@ -835,86 +836,98 @@ int main(int argc, char *argv[])
                     break;
                 }
             case SDL_KEYDOWN:
-                switch (event.key.keysym.sym)
+                if (crash_time_count == -1)
                 {
-                case SDLK_UP:
-                    throttle = 1;
-                    break;
-                case SDLK_LEFT:
-                    turning = -1;
-                    break;
-                case SDLK_RIGHT:
-                    turning = 1;
-                    break;
-                case SDLK_q:
-                    if (!q_is_locked)
+                    switch (event.key.keysym.sym)
                     {
-                        send_lock(CAN_DOOR1_LOCK);
+                    case SDLK_UP:
+                        throttle = 1;
+                        break;
+                    case SDLK_LEFT:
+                        turning = -1;
+                        break;
+                    case SDLK_RIGHT:
+                        turning = 1;
+                        break;
+                    case SDLK_q:
+                        if (!q_is_locked)
+                        {
+                            send_lock(CAN_DOOR1_LOCK);
+                        }
+                        else
+                        {
+                            send_unlock(CAN_DOOR1_LOCK);
+                        }
+                        q_is_locked = !q_is_locked;
+                        break;
+                    case SDLK_w:
+                        if (!w_is_locked)
+                        {
+                            send_lock(CAN_DOOR2_LOCK);
+                        }
+                        else
+                        {
+                            send_unlock(CAN_DOOR2_LOCK);
+                        }
+                        w_is_locked = !w_is_locked;
+                        break;
+                    case SDLK_a:
+                        if (!a_is_locked)
+                        {
+                            send_lock(CAN_DOOR3_LOCK);
+                        }
+                        else
+                        {
+                            send_unlock(CAN_DOOR3_LOCK);
+                        }
+                        a_is_locked = !a_is_locked;
+                        break;
+                    case SDLK_s:
+                        if (!s_is_locked)
+                        {
+                            send_lock(CAN_DOOR4_LOCK);
+                        }
+                        else
+                        {
+                            send_unlock(CAN_DOOR4_LOCK);
+                        }
+                        s_is_locked = !s_is_locked;
+                        break;
                     }
-                    else
-                    {
-                        send_unlock(CAN_DOOR1_LOCK);
-                    }
-                    q_is_locked = !q_is_locked;
-                    break;
-                case SDLK_w:
-                    if (!w_is_locked)
-                    {
-                        send_lock(CAN_DOOR2_LOCK);
-                    }
-                    else
-                    {
-                        send_unlock(CAN_DOOR2_LOCK);
-                    }
-                    w_is_locked = !w_is_locked;
-                    break;
-                case SDLK_a:
-                    if (!a_is_locked)
-                    {
-                        send_lock(CAN_DOOR3_LOCK);
-                    }
-                    else
-                    {
-                        send_unlock(CAN_DOOR3_LOCK);
-                    }
-                    a_is_locked = !a_is_locked;
-                    break;
-                case SDLK_s:
-                    if (!s_is_locked)
-                    {
-                        send_lock(CAN_DOOR4_LOCK);
-                    }
-                    else
-                    {
-                        send_unlock(CAN_DOOR4_LOCK);
-                    }
-                    s_is_locked = !s_is_locked;
+                    kk_check(event.key.keysym.sym);
                     break;
                 }
-                kk_check(event.key.keysym.sym);
-                break;
             case SDL_KEYUP:
-                switch (event.key.keysym.sym)
+                if (crash_time_count == -1)
                 {
-                case SDLK_UP:
-                    throttle = -1;
-                    break;
-                case SDLK_LEFT:
-                case SDLK_RIGHT:
-                    turning = 0;
-                    break;
-                case SDLK_c:
-                    current_speed *= 0.1;
-                    crash_time_count = time_counter;
-                    throttle = 0;
+                    switch (event.key.keysym.sym)
+                    {
+                    case SDLK_UP:
+                        throttle = -1;
+                        break;
+                    case SDLK_LEFT:
+                    case SDLK_RIGHT:
+                        turning = 0;
+                        break;
+                    case SDLK_c:
+                        current_speed *= 0.1;
+                        crash_time_count = time_counter;
+                        throttle = 0;
 
-                    renderer = SDL_CreateRenderer(window, -1, 0);
-                    SDL_Surface *image = IMG_Load(get_data("crash.png"));
-                    base_texture = SDL_CreateTextureFromSurface(renderer, image);
-                    SDL_RenderCopy(renderer, base_texture, NULL, NULL);
-                    SDL_RenderPresent(renderer);
+                        SDL_DestroyTexture(base_texture);
+                        SDL_FreeSurface(image);
+                        SDL_GameControllerClose(gGameController);
+                        SDL_DestroyRenderer(renderer);
 
-                    break;
+                        renderer = SDL_CreateRenderer(window, -1, 0);
+                        SDL_DestroyTexture(base_texture);
+                        SDL_Surface *crash_image = IMG_Load(get_data("crash.png"));
+                        crash_texture = SDL_CreateTextureFromSurface(renderer, crash_image);
+                        SDL_RenderCopy(renderer, crash_texture, NULL, NULL);
+                        SDL_RenderPresent(renderer);
+
+                        break;
+                    }
                 }
 
             case SDL_JOYAXISMOTION:
