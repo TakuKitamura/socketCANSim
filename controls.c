@@ -747,7 +747,7 @@ int main(int argc, char *argv[])
         printf("Window could not be shown\n");
     }
     renderer = SDL_CreateRenderer(window, -1, 0);
-    SDL_Surface *image = IMG_Load(get_data("joypad.png"));
+    SDL_Surface *image = IMG_Load(get_data("manual.png"));
     base_texture = SDL_CreateTextureFromSurface(renderer, image);
     SDL_RenderCopy(renderer, base_texture, NULL, NULL);
     SDL_RenderPresent(renderer);
@@ -907,6 +907,13 @@ int main(int argc, char *argv[])
                     current_speed *= 0.1;
                     crash_time_count = time_counter;
                     throttle = 0;
+
+                    renderer = SDL_CreateRenderer(window, -1, 0);
+                    SDL_Surface *image = IMG_Load(get_data("crash.png"));
+                    base_texture = SDL_CreateTextureFromSurface(renderer, image);
+                    SDL_RenderCopy(renderer, base_texture, NULL, NULL);
+                    SDL_RenderPresent(renderer);
+
                     break;
                 }
 
