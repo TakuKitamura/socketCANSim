@@ -78,7 +78,7 @@
 #define PS3_X_ROT 4
 #define PS3_Y_ROT 5
 #define PS3_Z_ROT 6    // The rotations are just guessed
-#define MAX_SPEED 90.0 // Limiter 260.0 is full guage speed
+#define MAX_SPEED 260.0 // Limiter 260.0 is full guage speed
 #define ACCEL_RATE 8.0 // 0-MAX_SPEED in seconds
 #define USB_CONTROLLER 0
 #define PS3_CONTROLLER 1
