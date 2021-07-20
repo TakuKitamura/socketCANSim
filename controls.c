@@ -912,7 +912,7 @@ int main(int argc, char *argv[])
                     case SDLK_c:
                         current_speed *= 0.1;
                         crash_time_count = time_counter;
-                        throttle = 0;
+                        throttle = -1;
 
                         SDL_DestroyTexture(base_texture);
                         SDL_FreeSurface(image);
