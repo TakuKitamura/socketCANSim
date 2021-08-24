@@ -201,3 +201,14 @@ fstar_uint8 parseDoor(uint32_t can_id, uint8_t can_dlc, uint8_t *data);
     get(data, 3) == 0 &&
     get(data, 4) == 0 &&
     get(data, 5) == 0
+    ```
+
+- 事後条件
+    - 正常系処理の場合code == 0,　異常系処理の場合はcode == 1
+    - retは引数で受けとったdata[2]と等しいこと
+    ```cpp
+    (
+        code == 0 &&
+        ret == get(data, 2)
+    ) || code == 1
+    ```
