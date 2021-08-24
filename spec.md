@@ -132,7 +132,7 @@ fstar_uint8 parseIndicator(uint32_t can_id, uint8_t can_dlc, uint8_t *data);
 - 事後条件
     - 正常系処理の場合code == 0,　異常系処理の場合はcode == 1
     - retは引数で受けとったdata[0]と等しいこと
-    
+
     ```cpp
     (
         code == 0 &&
@@ -167,18 +167,9 @@ fstar_uint8 parseIndicator(uint32_t can_id, uint8_t can_dlc, uint8_t *data);
 
 `0x00, 0x00, 0b00001000, 0x00, 0x00, 0x00`
 
-##### 正常なパケットの条件
-
-- 左から3バイト目以外のバイト列はすべて`0x00`であること
-- 左から3バイト目の値は`0x00`以上`0x0F`以下の値であること
-
-##### 異常パケットの条件
-
-- 正常なパケットの条件を満たさない場合
-
 ##### ドアのロック・アンロックデータ部パーサのプロトタイプ宣言
 
-```c
+```cpp
 struct struct_error {
     int32_t code; // 正常データの場合は0
     char* message;
@@ -188,5 +179,25 @@ struct fstar_uint8 {
     struct_error error;
 }
 // codeの値を確認して、エラーか正常か判定する
-fstar_uint8 parseDoor(uint8_t *data, uint8_t data_length);
+fstar_uint8 parseDoor(uint32_t can_id, uint8_t can_dlc, uint8_t *data);
 ```
+
+##### 正常なパケットの条件
+
+- 事前条件
+    - dataサイズは8
+    - can_id == 0x19B
+    - can_dlc == 6
+    - 左から3バイト目以外のバイト列はすべて`0x00`であること
+    - 左から3バイト目の値は`0x00`以上`0x0F`以下の値であること
+
+    ```cpp
+    len(data) == 8 &&
+    can_id == 0x19B &&
+    can_dlc == 6 &&
+    get(data, 0) == 0 &&
+    get(data, 1) == 0 &&
+    get(data, 2) <= 0x0F &&
+    get(data, 3) == 0 &&
+    get(data, 4) == 0 &&
+    get(data, 5) == 0
