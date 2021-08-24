@@ -96,29 +96,49 @@ fstar_int32_array parseSpeed(uint32_t can_id, uint8_t can_dlc, uint8_t *data);
 
 `0x02, 0x00, 0x00, 0x00`
 
-##### 正常なパケットの条件
-
-- 左から2バイト目以降のバイト列はすべて`0x00`であること
-- 左から1バイト目の値は`0x00 or 0x01 or 0x02`であること
-
-##### 異常パケットの条件
-
-- 正常なパケットの条件を満たさない場合
-
 ##### ウインカーデータ部パーサのプロトタイプ宣言
 
-```c
+```cpp
 struct struct_error {
     int32_t code; // 正常データの場合は0
     char* message;
 }
 struct fstar_uint8 {
-    uint8_t value; // ex. 0x00
+    uint8_t value; // ex. 0x01
     struct_error error;
 }
 // codeの値を確認して、エラーか正常か判定する
-fstar_uint8 parseIndicator(uint8_t *data, uint8_t data_length);
+fstar_uint8 parseIndicator(uint32_t can_id, uint8_t can_dlc, uint8_t *data);
 ```
+
+##### 事前条件・事後条件
+
+- 事前条件
+    - dataサイズは8
+    - can_id == 0x188
+    - can_dlc == 4
+    - 左から1バイト目の値は`0x00 or 0x01 or 0x02`であること
+    - 左から2バイト目以降のバイト列はすべて`0x00`であること
+
+    ```cpp
+    len(data) == 8 &&
+    can_id == 0x188 &&
+    can_dlc == 4 &&
+    get(data, 0) <= 0x02 &&
+    get(data, 1) == 0 &&
+    get(data, 2) == 0 &&
+    get(data, 3) == 0
+    ```
+- 事後条件
+    - 正常系処理の場合code == 0,　異常系処理の場合はcode == 1
+    - retは引数で受けとったdata[0]と等しいこと
+    
+    ```cpp
+    (
+        code == 0 &&
+        ret == get(data, 0)
+    ) || code == 1
+    ```
 
 ## ドアのロック・アンロック
 
