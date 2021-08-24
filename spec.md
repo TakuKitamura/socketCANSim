@@ -32,30 +32,51 @@
 (((0xE0 - 0xD0) * 0xFF) + 0x40) / 0x10 = 259(mph)
 ```
 
-##### 正常なパケットの条件
-
-- 3 バイト目以降のバイト列はすべて`0x00`
-- 左から2バイト目の値は`0xD0`以上であること
-    - 0xD0未満であると、マイナスの mph になるため、正常なパケットではない
-
-##### 異常パケットの条件
-
-- 正常なパケットの条件を満たさない場合
-
 ##### 速度データ部パーサのプロトタイプ宣言
 
-```c
+```cpp
 struct struct_error {
     int32_t code; // 正常データの場合は0
     char* message;
 }
 struct fstar_int32_array {
-    int32_t* value; // ex. [0x64, 0xE0]
+    int32_t* value; // ex. 動的配列 [0x64, 0xE0]
     struct_error error;
 }
 // codeの値を確認して、エラーか正常か判定する
-fstar_int32_array parseSpeed(uint8_t *data, uint8_t data_length);
+fstar_int32_array parseSpeed(uint32_t can_id, uint8_t can_dlc, uint8_t *data);
 ```
+
+##### 事前条件・事後条件
+
+- 事前条件
+    - dataサイズは8
+    - can_id == 0x1B4
+    - can_dlc == 5
+    - 左から2バイト目の値は`0xD0`以上であること
+        - 0xD0未満であると、マイナスの mph になるため、正常なパケットではないため
+    - 3 バイト目以降のバイト列はすべて`0x00`
+    ```cpp
+    len(data) == 8 && 
+    can_id == 0x1b4 &&
+    can_dlc == 5 &&
+    get(data, 1) >= 0xD0 &&
+    get(data, 2) == 0 &&
+    get(data, 3) == 0 &&
+    get(data, 4) == 0
+    ```
+- 事後条件
+    - 正常系処理の場合code == 0,　異常系処理の場合はcode == 1
+    - 配列の要素数は2であること
+    - retの1,2バイト目は引数で受けとったdata[0],data[1]と等しいこと
+    ```cpp
+    (
+        code == 0 &&
+        len(ret) == 2 &&
+        get(ret, 1) == get(data, 1) &&
+        get(ret, 2) == get(data, 2)
+    ) || code == 1
+    ```
 
 ## ウインカー表示
 
