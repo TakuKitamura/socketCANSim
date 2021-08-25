@@ -44,7 +44,7 @@ struct fstar_int32_array {
     struct_error error;
 }
 // codeの値を確認して、エラーか正常か判定する
-fstar_int32_array parseSpeed(uint32_t can_id, uint8_t can_dlc, uint8_t *data);
+fstar_int32_array parseSpeed(uint32 can_id, uint8 can_dlc, uint8[] data);
 ```
 
 ##### 事前条件・事後条件
@@ -108,7 +108,7 @@ struct fstar_uint8 {
     struct_error error;
 }
 // codeの値を確認して、エラーか正常か判定する
-fstar_uint8 parseIndicator(uint32_t can_id, uint8_t can_dlc, uint8_t *data);
+fstar_uint8 parseIndicator(uint32 can_id, uint8 can_dlc, uint8[] data);
 ```
 
 ##### 事前条件・事後条件
@@ -179,7 +179,7 @@ struct fstar_uint8 {
     struct_error error;
 }
 // codeの値を確認して、エラーか正常か判定する
-fstar_uint8 parseDoor(uint32_t can_id, uint8_t can_dlc, uint8_t *data);
+fstar_uint8 parseDoor(uint32 can_id, uint8 can_dlc, uint8[] data);
 ```
 
 ##### 正常なパケットの条件
