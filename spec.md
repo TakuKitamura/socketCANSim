@@ -43,7 +43,7 @@ struct fstar_int32_array {
     int32_t* value; // ex. 動的配列 [0x64, 0xE0]
     struct_error error;
 }
-// codeの値を確認して、エラーか正常か判定する
+// codeの値を確認して、エラーか正常か判定する. TODO: 仕様の見直し
 fstar_int32_array parseSpeed(uint32 can_id, uint8 can_dlc, uint8[] data);
 ```
 
@@ -68,13 +68,10 @@ fstar_int32_array parseSpeed(uint32 can_id, uint8 can_dlc, uint8[] data);
 - 事後条件
     - 正常系処理の場合code == 0,　異常系処理の場合はcode == 1
     - 配列の要素数は2であること
-    - retの1,2バイト目は引数で受けとったdata[0],data[1]と等しいこと
     ```cpp
     (
         code == 0 &&
-        len(ret) == 2 &&
-        get(ret, 1) == get(data, 1) &&
-        get(ret, 2) == get(data, 2)
+        len(ret) == 2
     ) || code == 1
     ```
 
