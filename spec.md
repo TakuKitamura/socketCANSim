@@ -28,7 +28,7 @@
 ##### 259 mph
 
 ```
-0x64, 0xE0, 0x00, 0x00, 0x00
+0x40, 0xE0, 0x00, 0x00, 0x00
 (((0xE0 - 0xD0) * 0xFF) + 0x40) / 0x10 = 259(mph)
 ```
 
@@ -36,11 +36,11 @@
 
 ```cpp
 struct struct_error {
-    int32_t code; // 正常データの場合は0
+    uint8_t code; // 正常データの場合は0
     char* message;
 }
-struct fstar_int32_array {
-    int32_t* value; // ex. 動的配列 [0x64, 0xE0]
+struct fstar_uint8_array {
+    uint8_t* value; // ex. 動的配列 [0x64, 0xE0]
     struct_error error;
 }
 // codeの値を確認して、エラーか正常か判定する. TODO: 仕様の見直し
