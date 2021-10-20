@@ -44,7 +44,7 @@ struct fstar_uint8_array {
     struct_error error;
 }
 // codeの値を確認して、エラーか正常か判定する. TODO: 仕様の見直し
-fstar_int32_array parseSpeed(uint32 can_id, uint8 can_dlc, uint8[] data);
+fstar_uint8_array parseSpeed(uint32 can_id, uint8 can_dlc, uint8[] data);
 ```
 
 ##### 事前条件・事後条件
