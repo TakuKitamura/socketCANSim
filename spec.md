@@ -9,6 +9,7 @@
 
 - バイト列としては左から 2 バイトのみ利用される
 - 速度範囲は0.0~765.0 mph(正常なパケットであれば)まで表せる
+- (ただし返す値の範囲は 0~0x2fd0)
 
 
 ##### mph への変換方法
@@ -39,12 +40,12 @@ struct struct_error {
     uint8_t code; // 正常データの場合は0
     char* message;
 }
-struct fstar_uint8_array {
-    uint8_t* value; // ex. 動的配列 [0x64, 0xE0]
+struct fstar_uint16 {
+    uint16_t value; // ex. 0x0~0x2fd0 (((左から2バイト目 - 0xD0) * 0xFF) + 左から1バイト目)
     struct_error error;
 }
 // codeの値を確認して、エラーか正常か判定する. TODO: 仕様の見直し
-fstar_uint8_array parseSpeed(uint32 can_id, uint8 can_dlc, uint8[] data);
+fstar_uint16 parseSpeed(uint32 can_id, uint8 can_dlc, uint8[] data);
 ```
 
 ##### 事前条件・事後条件
@@ -71,6 +72,7 @@ fstar_uint8_array parseSpeed(uint32 can_id, uint8 can_dlc, uint8[] data);
     ```cpp
     (
         code == 0 &&
+        ret <= 0x2fd0
         len(ret) == 2
     ) || code == 1
     ```
