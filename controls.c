@@ -1,7 +1,7 @@
 /*
  * Control panel for IC Simulation
  *
- * OpenGarages 
+ * OpenGarages
  *
  * craig@theialabs.com
  */
@@ -114,7 +114,7 @@ int gJoyX = JOY_UNKNOWN;
 int gJoyY = JOY_UNKNOWN;
 int gJoyZ = JOY_UNKNOWN;
 
-//Analog joystick dead zone
+// Analog joystick dead zone
 const int JOYSTICK_DEAD_ZONE = 8000;
 int gLastAccelValue = 0; // Non analog R2
 
@@ -771,12 +771,17 @@ int main(int argc, char *argv[])
 
     while (running)
     {
+        if (crash_time_count >= 0)
+        {
+            current_speed *= 0.95;
+        }
+
         if (crash_time_count >= 0 && time_counter - crash_time_count <= INTERVAL_MAX)
         {
-            srand(time(NULL));
 
             if (time_counter - crash_time_count == unlock_door1_interval)
             {
+                srand(time(NULL));
                 if (rand() % 2 == 0)
                 {
                     send_unlock(CAN_DOOR1_LOCK);
@@ -785,6 +790,7 @@ int main(int argc, char *argv[])
 
             if (time_counter - crash_time_count == unlock_door2_interval)
             {
+                srand(time(NULL));
                 if (rand() % 2 == 0)
                 {
                     send_unlock(CAN_DOOR2_LOCK);
@@ -793,6 +799,7 @@ int main(int argc, char *argv[])
 
             if (time_counter - crash_time_count == unlock_door3_interval)
             {
+                srand(time(NULL));
                 if (rand() % 2 == 0)
                 {
                     send_unlock(CAN_DOOR3_LOCK);
@@ -801,6 +808,7 @@ int main(int argc, char *argv[])
 
             if (time_counter - crash_time_count == unlock_door4_interval)
             {
+                srand(time(NULL));
                 if (rand() % 2 == 0)
                 {
                     send_unlock(CAN_DOOR4_LOCK);
@@ -910,7 +918,7 @@ int main(int argc, char *argv[])
                         turning = 0;
                         break;
                     case SDLK_c:
-                        current_speed *= 0.1;
+                        // current_speed *= 0.5;
                         crash_time_count = time_counter;
                         throttle = -1;
 
@@ -1043,7 +1051,7 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    //if(debug) printf("Unassigned button: %d\n", event.jbutton.button);
+                    // if(debug) printf("Unassigned button: %d\n", event.jbutton.button);
                 }
                 break;
             case SDL_JOYDEVICEADDED:
@@ -1093,7 +1101,7 @@ int main(int argc, char *argv[])
 
     close(s);
     SDL_DestroyTexture(base_texture);
-    SDL_FreeSurface(image);
+    SDL_FreeSurface(image); 
     SDL_GameControllerClose(gGameController);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
