@@ -205,9 +205,11 @@ fstar_uint8 parseDoor(uint32 can_id, uint8 can_dlc, uint8[] data);
 - 事後条件
     - 正常系処理の場合code == 0,　異常系処理の場合はcode == 1
     - retは引数で受けとったdata[2]と等しいこと
+    - 返り値は15以下であること
     ```cpp
     (
         code == 0 &&
-        ret == get(data, 2)
+        ret == get(data, 2) &&
+        ret <= 15
     ) || code == 1
     ```
