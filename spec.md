@@ -67,14 +67,10 @@ fstar_uint16 parseSpeed(uint32 can_id, uint8 can_dlc, uint8[] data);
     get(data, 4) == 0
     ```
 - 事後条件
-    - 正常系処理の場合code == 0,　異常系処理の場合はcode == 1
-    - 配列の要素数は2であること
+    - 正常系処理の場合code == 0 かつ valueが0x2fd0以下, 異常系処理の場合はcode == 1
     ```cpp
-    (
-        code == 0 &&
-        ret <= 0x2fd0
-        len(ret) == 2
-    ) || code == 1
+    (fstar_uint16.error.code == 0 && fstar_uint16.value <= 0x2fd0 ) ||
+    fstar_uint16.error.code == 1
     ```
 
 ## ウインカー表示
@@ -129,14 +125,13 @@ fstar_uint8 parseIndicator(uint32 can_id, uint8 can_dlc, uint8[] data);
     get(data, 3) == 0
     ```
 - 事後条件
-    - 正常系処理の場合code == 0,　異常系処理の場合はcode == 1
+    - 正常系処理の場合code == 0, 異常系処理の場合はcode == 1
     - retは引数で受けとったdata[0]と等しいこと
+    - ret <= 0x02
 
     ```cpp
-    (
-        code == 0 &&
-        ret == get(data, 0)
-    ) || code == 1
+    (fstar_uint8.error.code == 0 && fstar_uint8.value == get(data, 0) && fstar_uint8.value <= 0x02) ||
+    fstar_uint8.error.code == 1
     ```
 
 ## ドアのロック・アンロック
@@ -203,13 +198,11 @@ fstar_uint8 parseDoor(uint32 can_id, uint8 can_dlc, uint8[] data);
     ```
 
 - 事後条件
-    - 正常系処理の場合code == 0,　異常系処理の場合はcode == 1
+    - 正常系処理の場合code == 0, 異常系処理の場合はcode == 1
     - retは引数で受けとったdata[2]と等しいこと
-    - 返り値は15以下であること
+    - 返り値は0x0F以下であること
     ```cpp
-    (
-        code == 0 &&
-        ret == get(data, 2) &&
-        ret <= 15
-    ) || code == 1
+    (fstar_uint8.error.code == 0 && fstar_uint8.value == get(data, 2) && fstar_uint8.value <= 0x0F) ||
+    fstar_uint8.error.code == 1
+
     ```
